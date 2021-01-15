@@ -1,88 +1,68 @@
 #!/usr/bin/python3
 
+import json
 import sys
 import csv
 import matplotlib.pyplot as plt
 
 welcome_ranking = dict()
 
+freeresponse    = {'OtherFR':[], 'Actions':[], 'FreeRep Com':[]}
+surveyquestions = dict()
+surveydata      = dict()
+frontmatter     = ['StartDate', 'EndDate', 'Status', 'Progress', 
+				   'Duration (in seconds)', 'Finished', 'RecordedDate',
+				   'ResponseId', 'DistributionChannel', 'UserLanguage',
+				   'Race', 'LGBTQIA', 'Identities', 'Citizen', 'Internat',
+				   'Immig', 'Year']
+
 with open(sys.argv[1], mode='r') as csv_file:
 	csv_reader = csv.DictReader(csv_file)
 	
 	for row in csv_reader:
 		if row['ResponseId'][:2] != 'R_':
-			for field in row:
-				print(field, row[field])
+			for i,field in enumerate(row):
+				if field in freeresponse: continue
+				if field in frontmatter: continue 
+				else:
+					if field not in surveyquestions:
+						surveyquestions[field] = row[field]
+						surveydata[field] = dict()
+						surveydata[field]['total'] = dict()
+		else:
+			# Gather identities
+			race = row['Race']
+			lgbt = row['LGBTQIA']
+			idmg = row['Identities']
+			citz = row['Citizen']
+			intn = row['Internat']
+			immg = row['Immig']
 			
-			sys.exit()
-		#print(row.keys())
-		#print(row['ResponseId'])
-		#print()
-		#print(row)
-		#print()
+			for q in surveydata:
+				if row[q] not in surveydata[q]['total']:
+					surveydata[q]['total'][row[q]] = 0
+				surveydata[q]['total'][row[q]] += 1
+				"""
+				break down by the identity variables
+				surveydata[q]['RaceYes/No'][Respnse] += 1
+				"""
+				
+
+print(json.dumps(surveydata,indent=4))
 		
-		#if row['Finished'] == 'False': continue
-		#print(row['Race'], row['LGBTQIA'])
-		#if row['Race'] == '': 
-		#	print(row)
-		#	sys.exit()
-		
-		"""
-		But also split data by all fields
-		"""
-		
-		race = row['Race']
-		lgbt = row['LGBTQIA']
-		idmg = row['Identities']
-		
-		if race == 'Yes' or lgbt == 'Yes' or idmg == 'Yes':
-			identities = True
-		else: identities = False
-		
-		citz = row['Citizen']
-		intn = row['Internat']
-		immg = row['Immig']
-		
-		citzen_status
-		
-		year = row['Year']
-		
-		#print(race)
-		#print()
-		#sys.exit()
-		# Rankings
-		
-		welcomed = row['Rank Lab_1']
-		print(race, year, welcomed)
-		if welcomed not in welcome_ranking:
-			welcome_ranking[welcomed] = 0
-		welcome_ranking[welcomed] += 1
-		
-		id_welcome = dict()
-		
-		id_welcome[identities][welcomed] += 1
-		
-		#print(row.values())
-		#sys.exit()
-sys.exit()
+"""
+for every question in surveydata:
+	vals = surveydata[q]['total'].values()
+	ranks  
 vals  = list(welcome_ranking.values())
 ranks = list(welcome_ranking.keys())
 plt.pie(vals, labels=ranks,autopct='%1.2f')
-plt.title('Do you feel welcomed?')
+plt.title(surveyquestions[q])
 plt.show()
 
-"""
 individual graphs for agreement per question
 graphs for agreement per question by broad categories
 	4 graphs, 1 for if yes on identities then another for if No on identities
 then graphs for all levels
 	x2 for each question and level
 """
-
-
-
-
-
-
-
-
