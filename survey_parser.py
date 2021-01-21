@@ -15,6 +15,9 @@ frontmatter     = ['StartDate', 'EndDate', 'Status', 'Progress',
 				   'ResponseId', 'DistributionChannel', 'UserLanguage',
 				   'Race', 'LGBTQIA', 'Identities', 'Citizen', 'Internat',
 				   'Immig', 'Year']
+quals = {'race' : None, 'lgbt' : None, 'idmg' : None, 
+		 'cit' : None, 'intn' : None, 'immg' : None, 
+		 'idcg' : None, 'cicg' : None}
 
 with open(sys.argv[1], mode='r') as csv_file:
 	csv_reader = csv.DictReader(csv_file)
@@ -31,21 +34,30 @@ with open(sys.argv[1], mode='r') as csv_file:
 						surveydata[field]['total'] = dict()
 		else:
 			# Gather identities
-			race = row['Race']
-			lgbt = row['LGBTQIA']
-			idmg = row['Identities']
-			citz = row['Citizen']
-			intn = row['Internat']
-			immg = row['Immig']
+			quals['race'] = row['Race']
+			quals['lgbt'] = row['LGBTQIA']
+			quals['idmg'] = row['Identities']
+			quals['citz'] = row['Citizen']
+			quals['intn'] = row['Internat']
+			quals['immg'] = row['Immig']
+			
+			identities = quals['race'] == 'Yes' or quals['lgbt'] == 'Yes' or quals['idmg'] == 'Yes'
+			citizen = quals['citz'] == 'Yes' or quals['intn'] == 'Yes' or quals['immg'] == 'Yes'
+			quals['idcg'] = identities
+			quals['cicg'] = citizen
+			
 			
 			for q in surveydata:
 				if row[q] not in surveydata[q]['total']:
 					surveydata[q]['total'][row[q]] = 0
 				surveydata[q]['total'][row[q]] += 1
-				"""
-				break down by the identity variables
-				surveydata[q]['RaceYes/No'][Respnse] += 1
-				"""
+				
+				for c in quals:
+					if c not in surveydata[q]: surveydata[q][c] = dict()
+					if quals[c] not in surveydata[q][c]:
+						surveydata[q][c][quals[c]] = 0
+					
+					surveydata[q][c][quals[c]] += 1
 				
 
 print(json.dumps(surveydata,indent=4))
