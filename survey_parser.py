@@ -48,6 +48,7 @@ with open(sys.argv[1], mode='r') as csv_file:
 			
 			
 			for q in surveydata:
+				if len(row[q]) == 0: row[q] = 'NoResponse'
 				if row[q] not in surveydata[q]['total']:
 					surveydata[q]['total'][row[q]] = 0
 				surveydata[q]['total'][row[q]] += 1
@@ -63,12 +64,16 @@ with open(sys.argv[1], mode='r') as csv_file:
 				
 
 print(json.dumps(surveydata,indent=4))
-
-"""		
+		
 for q in surveydata:
-	for levels in surveydata[q]:
-		for resp
-"""	
+	for level in surveydata[q]:
+		if level == 'total':
+			vals = surveydata[q]['total'].values()
+			answ = surveydata[q]['total'].keys()
+			plt.pie(vals, labels=answ, autopct='%1.2f')
+			plt.title(surveyquestions[q])
+			plt.show()
+			sys.exit()
 	
 
 """
