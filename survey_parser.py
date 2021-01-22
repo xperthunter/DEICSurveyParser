@@ -55,13 +55,22 @@ with open(sys.argv[1], mode='r') as csv_file:
 				for c in quals:
 					if c not in surveydata[q]: surveydata[q][c] = dict()
 					if quals[c] not in surveydata[q][c]:
-						surveydata[q][c][quals[c]] = 0
+						surveydata[q][c][quals[c]] = dict()
+					if row[q] not in surveydata[q][c][quals[c]]:
+						surveydata[q][c][quals[c]][row[q]] = 0
 					
-					surveydata[q][c][quals[c]] += 1
+					surveydata[q][c][quals[c]][row[q]] += 1
 				
 
 print(json.dumps(surveydata,indent=4))
-		
+
+"""		
+for q in surveydata:
+	for levels in surveydata[q]:
+		for resp
+"""	
+	
+
 """
 for every question in surveydata:
 	vals = surveydata[q]['total'].values()
