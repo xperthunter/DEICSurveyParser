@@ -72,4 +72,4 @@ for q in data:
 		margin=1
 	)
 	writer.write_table()
-	print()
+	print()	
